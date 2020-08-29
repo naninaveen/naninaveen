@@ -53,7 +53,7 @@ jobs:
           })
       env:
         ERROR_STRING: "You have not configured your baseurl correctly, please read the instructions in _config.yml carefully."
-        RUN_ID: ${{ github.run_id	}}
+        RUN_ID: ${{ github.run_id }}
 
     - name: check for User Pages
       id: userpage

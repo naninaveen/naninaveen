@@ -9,7 +9,6 @@ layout: default
 
   {{ content | markdownify }}
 
-
   {% if site.paginate %}
     {% assign rawposts = paginator.posts %}
   {% else %}
@@ -29,7 +28,6 @@ layout: default
   {% assign sticky_posts = ''|split:'' %}
   {% assign non_sticky_posts = '' | split:'' %}
 
- 
   {% for gp in grouped_posts %}
     {%- if gp.name == "" -%}
       {% assign non_sticky_posts = gp.items | sort: "date" | reverse %}
