@@ -5,9 +5,7 @@ permalink: /about/
 ---
 
 ## Welcome to Random Programming Stuff.
-<center>
-![](https://picusm.pictures/200/200.webp?blur=2&grayscale)
-</center>
+![]({{ site.baseurl }}/images/home-page.jpg)
 
 Here you'll find some random programming articles on various topics such as python programming tips, web design,  web scraping, working with useful python libraries etc.
 Most of the posts will be about solving a well known problem, and some posts on solving problems which are not at all problems.

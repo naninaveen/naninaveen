@@ -1,25 +1,25 @@
 <script>
-    $(document).ready(function () {
+    window.onload = function () {
         let random_int = Math.round(Math.random() * 2352);
         if (random_int === 404) {
             alert("You're some randomly (un)lucky person");
         }
-        fetch(`https://xkcd.com/${random_int}/info.0.json`).then(function (xkcd_res) {
+        fetch(`https://cors-anywhere.herokuapp.com/https://xkcd.com/${random_int}/info.0.json`).then(function (xkcd_res) {
             return xkcd_res.json();
         }).then(function (xkcd_json) {
             document.getElementById("random_xkcd_img").src = xkcd_json.img;
             document.getElementById("random_xkcd_img").alt = xkcd_json.alt;
             document.getElementById("random_xkcd_anchor").href = "https://xkcd.com/" + random_int;
-            document.getElementById("random_xkcd_caption").innerText = xkcd_json.safe_title;
+            document.getElementById("random_xkcd_caption").innerHTML = "<h4>" + xkcd_json.safe_title + "</h4>";
         });
-    });
+    };
 </script>
 <div class = "xkcd-img">
-  Here's a random <a href="https://xkcd.com/">XKCD comic</a> for you.
+  <h3>Here's a random <a href = "https://xkcd.com/">XKCD comic</a> for you.</h3>
   <a id = "random_xkcd_anchor">
     <figure>
       <img alt = "Random XKCD comic" id = "random_xkcd_img"/>
-      <figcaption id="random_xkcd_caption"></figcaption>
+      <figcaption id = "random_xkcd_caption"></figcaption>
     </figure>
   </a>
 </div>
