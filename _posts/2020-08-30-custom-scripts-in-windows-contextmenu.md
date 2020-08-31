@@ -13,6 +13,7 @@ permalink: /python/organizing-windows-contextmenu/
 
 categories: [python, windows, contextmenu]
 ---
+![]({{ site.baseurl }}/images/python/contextmenu/4.png)
 # Grouping custom scripts in windows right click contextmenu
 
 ## The problem
@@ -31,11 +32,11 @@ It took me some experimentation and time to figure out how Windows actually deal
 
 There are atleast 15 registry keys where you can add context menu items.
 1. `{BASE_ROOT}\\Directory\\shell\\` - to displays items when right click on a directory
-1. `{BASE_ROOT}\\Drive\\shell\\` - to displays items when right click on a drive
 1. `{BASE_ROOT}\\Directory\\Background\\shell\\` - to displays items when right click on empty space in the file explorer
+1. `{BASE_ROOT}\\DesktopBackground\\shell\\` - to displays items when right click on desktop background
+1. `{BASE_ROOT}\\Drive\\shell\\` - to displays items when right click on a drive
 1. `{BASE_ROOT}\\*\\shell\\` - to displays items when right click on any file(s)
 1. `{BASE_ROOT}\\SystemFileAssociations\\{FILE_TYPE}\\shell\\` - to displays items when right click on a `FILE_TYPE` file type
-1. `{BASE_ROOT}\\DesktopBackground\\shell\\` - to displays items when right click on desktop background
 
 where `BASE_ROOT` can be `HKEY_CLASSES_ROOT`, `HKEY_CURRENT_USER\\Software\\Classes` or `HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes`.
 For adding items to all users `HKEY_CLASSES_ROOT` is used, and for adding items to the current user `HKEY_CURRENT_USER\\Software\\Classes` is used.
@@ -153,10 +154,99 @@ Now, after running the complete script you'll get the following output.
 
 ![]({{ site.baseurl }}/images/python/contextmenu/2.png)
 
-Open the registry editor and go to `HKEY_CURRENT_USER\\Software\\Classes\\Directory\\Background\\shell\\Group1\\shell\\`.
+Open the registry editor and go to `HKEY_CURRENT_USER\\Software\\Classes\\Directory\\Background\\shell\\`.
 You'll see the following structure corresponding to the context menu group we've created.
 
 ![]({{ site.baseurl }}/images/python/contextmenu/3.png)
 
-:smiley: :star2: :clap: we did it.
-The complete script can be found at [this link](https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412).
+Congratulations, :smiley: :clap: :star2: we did it.
+The complete test script can be found at [this link](https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412).
+
+## General purpose implementation
+
+For adding the groups and menu items to the context menu, first let us define two classes `ContextMenuItem` and `ContextMenuGroup` for representing a menu item and a menu group respectively.
+```python
+class ContextMenuItem(object):
+    def __init__(self, item_name, command, item_reg_key = "", icon = ""):
+        self.item_name = item_name
+        self.item_reg_key = item_name if item_reg_key == "" else item_reg_key
+        self.icon = icon
+        self.command = command
+
+
+class ContextMenuGroup(object):
+    def __init__(self, group_name, group_reg_key = "", icon = ""):
+        self.group_name = group_name
+        self.group_reg_key = group_name if group_reg_key == "" else group_reg_key
+        self.icon = icon
+        self.items = []
+
+    def add_item(self, item):
+        assert isinstance(
+            item, (ContextMenuItem, ContextMenuGroup)
+        ), "Please pass instance of ContextMenuItem or ContextMenuGroup"
+        self.items.append(item)
+```
+Consider the following script which creates some nested groups and adds items to them.
+```python
+group1 = ContextMenuGroup("Group 1")
+group2 = ContextMenuGroup("Group 2")
+group3 = ContextMenuGroup("Group 3")
+
+group1.add_item(ContextMenuItem("Item 1", "cmd.exe"))
+group1.add_item(ContextMenuItem("Item 2", "cmd.exe"))
+
+group2.add_item(ContextMenuItem("Item 3", "cmd.exe"))
+group2.add_item(ContextMenuItem("Item 4", "cmd.exe"))
+
+group3.add_item(ContextMenuItem("Item 5", "cmd.exe"))
+group3.add_item(ContextMenuItem("Item 6", "cmd.exe"))
+
+group2.add_item(group3)
+group1.add_item(group2)
+```
+Now to add the details of `ContextMenuItem` and `ContextMenuGroup` to the registry, define two functions `create_item` and `create_group`.
+The steps of the functions are taken from the test implementation.
+```python
+from winreg import (
+    CreateKey,
+    SetValue,
+    SetValueEx,
+    CloseKey,
+    REG_SZ
+)
+def create_item(root_key, item: ContextMenuItem):
+    item_key = CreateKey(root_key, item.item_reg_key)
+    SetValue(item_key, '', REG_SZ, item.item_name)
+    SetValue(item_key, 'command', REG_SZ, item.command)
+    if item.icon != "":
+        SetValueEx(item_key, 'Icon', 0, REG_SZ, item.icon)
+    CloseKey(item_key)
+
+
+def create_group(root_key, group: ContextMenuGroup):
+    group_key = CreateKey(root_key, group.group_reg_key)
+
+    SetValueEx(group_key, 'MUIVerb', 0, REG_SZ, group.group_name)
+    SetValueEx(group_key, 'SubCommands', 0, REG_SZ, '')
+    if group.icon != "":
+        SetValueEx(group_key, 'Icon', 0, REG_SZ, group.icon)
+
+    subcommands_key = CreateKey(group_key, "shell")
+
+    for item in group.items:
+        if isinstance(item, ContextMenuItem):
+            create_item(subcommands_key, item)
+        elif isinstance(item, ContextMenuGroup):
+            create_group(subcommands_key, item)
+```
+Now open the root key for directory background and create the group
+```python
+user_key = CreateKey(
+    HKEY_CURRENT_USER,
+    r"Software\\Classes\\Directory\\Background\\shell\\"
+)
+create_group(user_key, group1)
+```
+Great, that's a nice nested context menu groups with items.
+![]({{ site.baseurl }}/images/python/contextmenu/4.png)
