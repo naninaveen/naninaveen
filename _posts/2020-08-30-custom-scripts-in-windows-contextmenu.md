@@ -7,7 +7,7 @@ title: Grouping custom scripts in windows right click contextmenu
 
 description: A simple way to organize your scripts as a group in windows contextmenu.
 
-image: images/python/contextmenu/right-click.png
+image: images/python/contextmenu/2.png
 
 permalink: /python/organizing-windows-contextmenu/
 
@@ -95,26 +95,68 @@ ROOT
 ## Implementation
 
 ### Test implementation
-Let us first implement a simple script to add a menu item group "Group 1" and a single item "Item 1" to the group.
+Let us first implement a simple script to add a menu item group "Group 1" and a two items "Item 1" and "Item 2" to the group.
 For adding registry keys we use python's `winreg` library.
+First we import the required functions from the `winreg` library.
 ```python
+# Import required functions
 from winreg import (
     CreateKey, # for creating/opening keys
     SetValue, # for setting a key value
-    SetValueEx, # for storing data in a given key
+    SetValueEx, # for storing key/value data
     HKEY_CURRENT_USER,
     REG_SZ, # to set value as a string
     CloseKey
 )
 ```
-Then create a key `HKEY_CURRENT_USER\\Software\\Classes\\Directory\\Background\\Shell\\TEST_ITEM`.
+Then we create the group registry key for the current user.
 ```python
-itemreg_key = CreateKey(HKEY_CURRENT_USER, r"Software\\Classes\\Directory\\Background\\Shell\\TEST_ITEM")
-# Set (Default) value to "Test item"
-# "Test item" is shown in the context menu
-SetValue(itemreg_key, '', REG_SZ, "Test item")
-# Create and set (Default) value for command key
-SetValue(itemreg_key, 'command', REG_SZ, "cmd.exe") # Opens a command prompt in the current directory
-CloseKey(itemreg_key)
-```
+# create the group registry key
+group_reg_key_str = r"Software\\Classes\\Directory\\Background\\shell\\Group1\\"
+group_reg_key = CreateKey(HKEY_CURRENT_USER, group_reg_key_str)
 
+# Create a key 'MUIVerb' and add 'Group 1' as value.
+# 'Group 1' is shown in the conextmenu
+SetValueEx(group_reg_key, 'MUIVerb', 0, REG_SZ, "Group 1")
+
+# Create a key 'SubCommands'
+SetValueEx(group_reg_key, 'SubCommands', 0, REG_SZ, '')
+
+# Create sub key "shell" for adding items
+subcommands_key = CreateKey(group_reg_key, 'shell')
+```
+When you run this script it will create the group named "Group 1" in the context menu.
+![]({{ site.baseurl }}/images/python/contextmenu/1.png)
+But we haven't added any items to that list.
+Let's continue and add two items.
+```python
+# Create item1 key
+item1_key = CreateKey(subcommands_key, 'item1')
+# Set item name
+SetValue(item1_key, '', REG_SZ, "Item 1")
+# Create command key and add the command
+SetValue(item1_key, 'command', REG_SZ, 'cmd.exe')
+CloseKey(item1_key)
+
+# Create item2 key
+item2_key = CreateKey(subcommands_key, 'item2')
+# Set item name
+SetValue(item2_key, '', REG_SZ, "Item 2")
+# Create command key and add the command
+SetValue(item2_key, 'command', REG_SZ, 'cmd.exe')
+CloseKey(item2_key)
+
+CloseKey(subcommands_key)
+CloseKey(group_reg_key)
+```
+Now, after running the complete script you'll get the following output.
+
+![]({{ site.baseurl }}/images/python/contextmenu/2.png)
+
+Open the registry editor and go to `HKEY_CURRENT_USER\\Software\\Classes\\Directory\\Background\\shell\\Group1\\shell\\`.
+You'll see the following structure corresponding to the context menu group we've created.
+
+![]({{ site.baseurl }}/images/python/contextmenu/3.png)
+
+:smiley: :star2: :clap: we did it.
+The complete script can be found at [this link](https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412).
