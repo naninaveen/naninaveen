@@ -88,7 +88,7 @@
        • <span class="read-time" title="Estimated read time">
     
     
-      4 min read
+      6 min read
     
 </span></p>
 
@@ -122,9 +122,11 @@
 <li class="toc-entry toc-h3"><a href="#test-implementation">Test implementation</a></li>
 </ul>
 </li>
+<li class="toc-entry toc-h2"><a href="#general-purpose-implementation">General purpose implementation</a></li>
 </ul>
 </li>
 </ul>
+<p><img src="/naninaveen/images/python/contextmenu/4.png" alt=""></p>
 <h1 id="grouping-custom-scripts-in-windows-right-click-contextmenu">
 <a class="anchor" href="#grouping-custom-scripts-in-windows-right-click-contextmenu" aria-hidden="true"><span class="octicon octicon-link"></span></a>Grouping custom scripts in windows right click contextmenu</h1>
 
@@ -149,15 +151,15 @@ It took me some experimentation and time to figure out how Windows actually deal
   <li>
 <code class="highlighter-rouge">{BASE_ROOT}\\Directory\\shell\\</code> - to displays items when right click on a directory</li>
   <li>
-<code class="highlighter-rouge">{BASE_ROOT}\\Drive\\shell\\</code> - to displays items when right click on a drive</li>
-  <li>
 <code class="highlighter-rouge">{BASE_ROOT}\\Directory\\Background\\shell\\</code> - to displays items when right click on empty space in the file explorer</li>
+  <li>
+<code class="highlighter-rouge">{BASE_ROOT}\\DesktopBackground\\shell\\</code> - to displays items when right click on desktop background</li>
+  <li>
+<code class="highlighter-rouge">{BASE_ROOT}\\Drive\\shell\\</code> - to displays items when right click on a drive</li>
   <li>
 <code class="highlighter-rouge">{BASE_ROOT}\\*\\shell\\</code> - to displays items when right click on any file(s)</li>
   <li>
 <code class="highlighter-rouge">{BASE_ROOT}\\SystemFileAssociations\\{FILE_TYPE}\\shell\\</code> - to displays items when right click on a <code class="highlighter-rouge">FILE_TYPE</code> file type</li>
-  <li>
-<code class="highlighter-rouge">{BASE_ROOT}\\DesktopBackground\\shell\\</code> - to displays items when right click on desktop background</li>
 </ol>
 
 <p>where <code class="highlighter-rouge">BASE_ROOT</code> can be <code class="highlighter-rouge">HKEY_CLASSES_ROOT</code>, <code class="highlighter-rouge">HKEY_CURRENT_USER\\Software\\Classes</code> or <code class="highlighter-rouge">HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes</code>.
@@ -277,13 +279,99 @@ Let’s continue and add two items.</p>
 
 <p><img src="/naninaveen/images/python/contextmenu/2.png" alt=""></p>
 
-<p>Open the registry editor and go to <code class="highlighter-rouge">HKEY_CURRENT_USER\\Software\\Classes\\Directory\\Background\\shell\\Group1\\shell\\</code>.
+<p>Open the registry editor and go to <code class="highlighter-rouge">HKEY_CURRENT_USER\\Software\\Classes\\Directory\\Background\\shell\\</code>.
 You’ll see the following structure corresponding to the context menu group we’ve created.</p>
 
 <p><img src="/naninaveen/images/python/contextmenu/3.png" alt=""></p>
 
-<p><img class="emoji" title=":smiley:" alt=":smiley:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f603.png" height="20" width="20"> <img class="emoji" title=":star2:" alt=":star2:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f31f.png" height="20" width="20"> <img class="emoji" title=":clap:" alt=":clap:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f44f.png" height="20" width="20"> we did it.
-The complete script can be found at <a href="https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412">this link</a>.</p>
+<p>Congratulations, <img class="emoji" title=":smiley:" alt=":smiley:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f603.png" height="20" width="20"> <img class="emoji" title=":clap:" alt=":clap:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f44f.png" height="20" width="20"> <img class="emoji" title=":star2:" alt=":star2:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f31f.png" height="20" width="20"> we did it.
+The complete test script can be found at <a href="https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412">this link</a>.</p>
+
+<h2 id="general-purpose-implementation">
+<a class="anchor" href="#general-purpose-implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>General purpose implementation</h2>
+
+<p>For adding the groups and menu items to the context menu, first let us define two classes <code class="highlighter-rouge">ContextMenuItem</code> and <code class="highlighter-rouge">ContextMenuGroup</code> for representing a menu item and a menu group respectively.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ContextMenuItem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_name</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">item_reg_key</span> <span class="o">=</span> <span class="s">""</span><span class="p">,</span> <span class="n">icon</span> <span class="o">=</span> <span class="s">""</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_name</span> <span class="o">=</span> <span class="n">item_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_reg_key</span> <span class="o">=</span> <span class="n">item_name</span> <span class="k">if</span> <span class="n">item_reg_key</span> <span class="o">==</span> <span class="s">""</span> <span class="k">else</span> <span class="n">item_reg_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="n">icon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">command</span>
+
+
+<span class="k">class</span> <span class="nc">ContextMenuGroup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">group_reg_key</span> <span class="o">=</span> <span class="s">""</span><span class="p">,</span> <span class="n">icon</span> <span class="o">=</span> <span class="s">""</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_name</span> <span class="o">=</span> <span class="n">group_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_reg_key</span> <span class="o">=</span> <span class="n">group_name</span> <span class="k">if</span> <span class="n">group_reg_key</span> <span class="o">==</span> <span class="s">""</span> <span class="k">else</span> <span class="n">group_reg_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="n">icon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="n">ContextMenuItem</span><span class="p">,</span> <span class="n">ContextMenuGroup</span><span class="p">)</span>
+        <span class="p">),</span> <span class="s">"Please pass instance of ContextMenuItem or ContextMenuGroup"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Consider the following script which creates some nested groups and adds items to them.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">group1</span> <span class="o">=</span> <span class="n">ContextMenuGroup</span><span class="p">(</span><span class="s">"Group 1"</span><span class="p">)</span>
+<span class="n">group2</span> <span class="o">=</span> <span class="n">ContextMenuGroup</span><span class="p">(</span><span class="s">"Group 2"</span><span class="p">)</span>
+<span class="n">group3</span> <span class="o">=</span> <span class="n">ContextMenuGroup</span><span class="p">(</span><span class="s">"Group 3"</span><span class="p">)</span>
+
+<span class="n">group1</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">ContextMenuItem</span><span class="p">(</span><span class="s">"Item 1"</span><span class="p">,</span> <span class="s">"cmd.exe"</span><span class="p">))</span>
+<span class="n">group1</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">ContextMenuItem</span><span class="p">(</span><span class="s">"Item 2"</span><span class="p">,</span> <span class="s">"cmd.exe"</span><span class="p">))</span>
+
+<span class="n">group2</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">ContextMenuItem</span><span class="p">(</span><span class="s">"Item 3"</span><span class="p">,</span> <span class="s">"cmd.exe"</span><span class="p">))</span>
+<span class="n">group2</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">ContextMenuItem</span><span class="p">(</span><span class="s">"Item 4"</span><span class="p">,</span> <span class="s">"cmd.exe"</span><span class="p">))</span>
+
+<span class="n">group3</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">ContextMenuItem</span><span class="p">(</span><span class="s">"Item 5"</span><span class="p">,</span> <span class="s">"cmd.exe"</span><span class="p">))</span>
+<span class="n">group3</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">ContextMenuItem</span><span class="p">(</span><span class="s">"Item 6"</span><span class="p">,</span> <span class="s">"cmd.exe"</span><span class="p">))</span>
+
+<span class="n">group2</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">group3</span><span class="p">)</span>
+<span class="n">group1</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">group2</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Now to add the details of <code class="highlighter-rouge">ContextMenuItem</code> and <code class="highlighter-rouge">ContextMenuGroup</code> to the registry, define two functions <code class="highlighter-rouge">create_item</code> and <code class="highlighter-rouge">create_group</code>.
+The steps of the functions are taken from the test implementation.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">winreg</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CreateKey</span><span class="p">,</span>
+    <span class="n">SetValue</span><span class="p">,</span>
+    <span class="n">SetValueEx</span><span class="p">,</span>
+    <span class="n">CloseKey</span><span class="p">,</span>
+    <span class="n">REG_SZ</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">create_item</span><span class="p">(</span><span class="n">root_key</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">ContextMenuItem</span><span class="p">):</span>
+    <span class="n">item_key</span> <span class="o">=</span> <span class="n">CreateKey</span><span class="p">(</span><span class="n">root_key</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">item_reg_key</span><span class="p">)</span>
+    <span class="n">SetValue</span><span class="p">(</span><span class="n">item_key</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">item_name</span><span class="p">)</span>
+    <span class="n">SetValue</span><span class="p">(</span><span class="n">item_key</span><span class="p">,</span> <span class="s">'command'</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">command</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">icon</span> <span class="o">!=</span> <span class="s">""</span><span class="p">:</span>
+        <span class="n">SetValueEx</span><span class="p">(</span><span class="n">item_key</span><span class="p">,</span> <span class="s">'Icon'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">icon</span><span class="p">)</span>
+    <span class="n">CloseKey</span><span class="p">(</span><span class="n">item_key</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_group</span><span class="p">(</span><span class="n">root_key</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">ContextMenuGroup</span><span class="p">):</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">CreateKey</span><span class="p">(</span><span class="n">root_key</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">group_reg_key</span><span class="p">)</span>
+
+    <span class="n">SetValueEx</span><span class="p">(</span><span class="n">group_key</span><span class="p">,</span> <span class="s">'MUIVerb'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">group_name</span><span class="p">)</span>
+    <span class="n">SetValueEx</span><span class="p">(</span><span class="n">group_key</span><span class="p">,</span> <span class="s">'SubCommands'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="s">''</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">icon</span> <span class="o">!=</span> <span class="s">""</span><span class="p">:</span>
+        <span class="n">SetValueEx</span><span class="p">(</span><span class="n">group_key</span><span class="p">,</span> <span class="s">'Icon'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">icon</span><span class="p">)</span>
+
+    <span class="n">subcommands_key</span> <span class="o">=</span> <span class="n">CreateKey</span><span class="p">(</span><span class="n">group_key</span><span class="p">,</span> <span class="s">"shell"</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">ContextMenuItem</span><span class="p">):</span>
+            <span class="n">create_item</span><span class="p">(</span><span class="n">subcommands_key</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">ContextMenuGroup</span><span class="p">):</span>
+            <span class="n">create_group</span><span class="p">(</span><span class="n">subcommands_key</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Now open the root key for directory background and create the group</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">user_key</span> <span class="o">=</span> <span class="n">CreateKey</span><span class="p">(</span>
+    <span class="n">HKEY_CURRENT_USER</span><span class="p">,</span>
+    <span class="s">r"Software\\Classes\\Directory\\Background\\shell\\"</span>
+<span class="p">)</span>
+<span class="n">create_group</span><span class="p">(</span><span class="n">user_key</span><span class="p">,</span> <span class="n">group1</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Great, that’s a nice nested context menu groups with items.
+<img src="/naninaveen/images/python/contextmenu/4.png" alt=""></p>
 
   </div>
 <a class="u-url" href="/naninaveen/python/organizing-windows-contextmenu/" hidden></a>
