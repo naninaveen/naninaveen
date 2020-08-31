@@ -82,7 +82,7 @@
        • <span class = "read-time" title = "Estimated read time">
     
     
-      1 min read
+      3 min read
     
 </span></p>
 
@@ -109,6 +109,11 @@
 <ul>
 <li class="toc-entry toc-h2"><a href="#the-problem">The problem</a></li>
 <li class="toc-entry toc-h2"><a href="#finding-the-solution">Finding the solution</a></li>
+<li class="toc-entry toc-h2"><a href="#implementation">Implementation</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#test-implementation">Test implementation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul><h1 id="grouping-custom-scripts-in-windows-right-click-contextmenu">
@@ -125,8 +130,110 @@ While I was tinkering about a solution, I right-clicked on the folder and though
 <h2 id="finding-the-solution">
 <a class="anchor" href="#finding-the-solution" aria-hidden="true"><span class="octicon octicon-link"></span></a>Finding the solution</h2>
 <p>The next moment, I stopped deleting files and instead started searching on google about “Adding python scripts to the Windows context menu”.
-I found some tutorials and found that adding items to the context menu requires creating keys in the windows registry.
-But as always, it took me a while to realize that there are more than 4 ways</p>
+I found a few tutorials and understood that adding items to the context menu requires creating keys in the windows registry.
+But thanks to the complexity of the Windows, the soutions I found seemed to be quite complex or less informative.
+While most of the tutorials focused on adding single item to the context menu, grouping items into a folder like structure is still not an intuitive step.
+It took me some experimentation and time to figure out how Windows actually deals with the registry keys when it comes to context menu.</p>
+
+<p>There are atleast 15 registry keys where you can add context menu items.</p>
+<ol>
+  <li>
+<code class="highlighter-rouge">{BASE_ROOT}\\Directory\\shell\\</code> - to displays items when right click on a directory</li>
+  <li>
+<code class="highlighter-rouge">{BASE_ROOT}\\Drive\\shell\\</code> - to displays items when right click on a drive</li>
+  <li>
+<code class="highlighter-rouge">{BASE_ROOT}\\Directory\\Background\\shell\\</code> - to displays items when right click on empty space in the file explorer</li>
+  <li>
+<code class="highlighter-rouge">{BASE_ROOT}\\*\\shell\\</code> - to displays items when right click on any file(s)</li>
+  <li>
+<code class="highlighter-rouge">{BASE_ROOT}\\SystemFileAssociations\\{FILE_TYPE}\\shell\\</code> - to displays items when right click on a <code class="highlighter-rouge">FILE_TYPE</code> file type</li>
+  <li>
+<code class="highlighter-rouge">{BASE_ROOT}\\DesktopBackground\\shell\\</code> - to displays items when right click on desktop background</li>
+</ol>
+
+<p>where <code class="highlighter-rouge">BASE_ROOT</code> can be <code class="highlighter-rouge">HKEY_CLASSES_ROOT</code>, <code class="highlighter-rouge">HKEY_CURRENT_USER\\Software\\Classes</code> or <code class="highlighter-rouge">HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes</code>.
+For adding items to all users <code class="highlighter-rouge">HKEY_CLASSES_ROOT</code> is used, and for adding items to the current user <code class="highlighter-rouge">HKEY_CURRENT_USER\\Software\\Classes</code> is used.</p>
+
+<p>Now, each item in the context menu is associated with the following information.</p>
+<ol>
+  <li>Description of the item to be displayed on the context menu</li>
+  <li>Registry key associated with the item</li>
+  <li>Command to be executed</li>
+  <li>[Optional] Path to an icon</li>
+</ol>
+
+<p>For grouping items into a folder like structure, the above details are required for each item along with</p>
+<ol>
+  <li>Name of the group</li>
+  <li>Registry key associated with the group</li>
+  <li>[Optional] Path to an icon</li>
+</ol>
+
+<p>The structure of the registry keys and values for a single item is shown below.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ROOT
+    ITEM_REG_KEY
+        = (Default) = Name of the item
+        = Icon = Path to an icon
+        command
+            = (Default) = Command
+</code></pre></div></div>
+<p>For a group of context menu items, the registry structure looks as follows.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ROOT
+    GROUP_REG_KEY
+        = MUIVerb = Group name
+        = Icon = Path to an icon
+        = Subcommands = 
+        Shell
+            ITEM1_REG_KEY
+                = (Default) = Name of the item1
+                = Icon = Path to an icon
+                command
+                    = (Default) = Command1
+            ITEM2_REG_KEY
+                = (Default) = Name of the item2
+                = Icon = Path to an icon
+                command
+                    = (Default) = Command2
+            SUBGROUP_REG_KEY
+                = MUIVerb = Subgroup name
+                = Icon = Path to an icon
+                = Subcommands = 
+                Shell
+                    ITEM1_REG_KEY
+                        = (Default) = Name of the item1
+                        = Icon = Path to an icon
+                        command
+                            = (Default) = Command1
+                    ...
+            ...
+</code></pre></div></div>
+
+<h2 id="implementation">
+<a class="anchor" href="#implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation</h2>
+
+<h3 id="test-implementation">
+<a class="anchor" href="#test-implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test implementation</h3>
+<p>Let us first implement a simple script to add a menu item group “Group 1” and a single item “Item 1” to the group.
+For adding registry keys we use python’s <code class="highlighter-rouge">winreg</code> library.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">winreg</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CreateKey</span><span class="p">,</span> <span class="c1"># for creating/opening keys
+</span>    <span class="n">SetValue</span><span class="p">,</span> <span class="c1"># for setting a key value
+</span>    <span class="n">SetValueEx</span><span class="p">,</span> <span class="c1"># for storing data in a given key
+</span>    <span class="n">HKEY_CURRENT_USER</span><span class="p">,</span>
+    <span class="n">REG_SZ</span><span class="p">,</span> <span class="c1"># to set value as a string
+</span>    <span class="n">CloseKey</span>
+<span class="p">)</span>
+</code></pre></div></div>
+<p>Then create a key <code class="highlighter-rouge">HKEY_CURRENT_USER\\Software\\Classes\\Directory\\Background\\Shell\\TEST_ITEM</code>.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">itemreg_key</span> <span class="o">=</span> <span class="n">CreateKey</span><span class="p">(</span><span class="n">HKEY_CURRENT_USER</span><span class="p">,</span> <span class="s">r"Software\\Classes\\Directory\\Background\\Shell\\TEST_ITEM"</span><span class="p">)</span>
+<span class="c1"># Set (Default) value to "Test item"
+# "Test item" is shown in the context menu
+</span><span class="n">SetValue</span><span class="p">(</span><span class="n">itemreg_key</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="s">"Test item"</span><span class="p">)</span>
+<span class="c1"># Create and set (Default) value for command key
+</span><span class="n">SetValue</span><span class="p">(</span><span class="n">itemreg_key</span><span class="p">,</span> <span class="s">'command'</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="s">"cmd.exe"</span><span class="p">)</span> <span class="c1"># Opens a command prompt in the current directory
+</span><span class="n">CloseKey</span><span class="p">(</span><span class="n">itemreg_key</span><span class="p">)</span>
+</code></pre></div></div>
+
 
   </div><a class="u-url" href="/naninaveen/python/organizing-windows-contextmenu/" hidden></a>
 </article>
