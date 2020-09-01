@@ -110,41 +110,17 @@
     </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <ul class="section-nav">
-<li class="toc-entry toc-h1">
-<a href="#grouping-custom-scripts-in-windows-right-click-contextmenu">Grouping custom scripts in windows right click contextmenu</a>
-<ul>
-<li class="toc-entry toc-h2"><a href="#the-problem">The problem</a></li>
-<li class="toc-entry toc-h2"><a href="#finding-the-solution">Finding the solution</a></li>
-<li class="toc-entry toc-h2">
-<a href="#implementation">Implementation</a>
-<ul>
-<li class="toc-entry toc-h3"><a href="#test-implementation">Test implementation</a></li>
-</ul>
-</li>
-<li class="toc-entry toc-h2"><a href="#general-purpose-implementation">General purpose implementation</a></li>
-</ul>
-</li>
-<li class="toc-entry toc-h1"><a href="#_%E3%83%84_">
+    <p><img src="/naninaveen/images/python/contextmenu/4.png" alt=""></p>
+<h1 id="grouping-custom-scripts-in-windows-right-click-contextmenu">Grouping custom scripts in windows right click contextmenu</h1>
 
-¯\_(ツ)_/¯
-
-</a></li>
-</ul>
-<p><img src="/naninaveen/images/python/contextmenu/4.png" alt=""></p>
-<h1 id="grouping-custom-scripts-in-windows-right-click-contextmenu">
-<a class="anchor" href="#grouping-custom-scripts-in-windows-right-click-contextmenu" aria-hidden="true"><span class="octicon octicon-link"></span></a>Grouping custom scripts in windows right click contextmenu</h1>
-
-<h2 id="the-problem">
-<a class="anchor" href="#the-problem" aria-hidden="true"><span class="octicon octicon-link"></span></a>The problem</h2>
+<h2 id="the-problem">The problem</h2>
 <p>One fine boring day, I was cleaning unnecessary files in my PC and realized that there are too many empty folders.
 Digging around my python scripts folders, I realized that once upon a time I wrote a script to clean empty folders.
 The script takes a directory path as an argument.
 But copying the directory path, launching the cmd prompt, and passing the directory path to the script is a waste of time.
 While I was tinkering about a solution, I right-clicked on the folder and thought if only there is a menu item “Clean empty folders” that can run my script, that will solve my problem.</p>
 
-<h2 id="finding-the-solution">
-<a class="anchor" href="#finding-the-solution" aria-hidden="true"><span class="octicon octicon-link"></span></a>Finding the solution</h2>
+<h2 id="finding-the-solution">Finding the solution</h2>
 <p>The next moment, I stopped deleting files and instead started searching on google about “Adding python scripts to the Windows context menu”.
 I found a few tutorials and understood that adding items to the context menu requires creating keys in the windows registry.
 But thanks to the complexity of the Windows, the solutions I found seemed to be quite complex or less informative.
@@ -224,11 +200,9 @@ For adding items to all users <code class="highlighter-rouge">HKEY_CLASSES_ROOT<
             ...
 </code></pre></div></div>
 
-<h2 id="implementation">
-<a class="anchor" href="#implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation</h2>
+<h2 id="implementation">Implementation</h2>
 
-<h3 id="test-implementation">
-<a class="anchor" href="#test-implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test implementation</h3>
+<h3 id="test-implementation">Test implementation</h3>
 <p>Let us first implement a simple script to add a menu item group “Group 1” and a two items “Item 1” and “Item 2” to the group.
 For adding registry keys we use python’s <code class="highlighter-rouge">winreg</code> library.
 First, we import the required functions from the <code class="highlighter-rouge">winreg</code> library.</p>
@@ -290,10 +264,9 @@ You’ll see the following structure corresponding to the context menu group we�
 <p><img src="/naninaveen/images/python/contextmenu/3.png" alt=""></p>
 
 <p>Congratulations, <img class="emoji" title=":smiley:" alt=":smiley:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f603.png" height="20" width="20"> <img class="emoji" title=":clap:" alt=":clap:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f44f.png" height="20" width="20"> <img class="emoji" title=":star2:" alt=":star2:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f31f.png" height="20" width="20"> we did it.
-The complete test script can be found at <a href="https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412">this link</a>.</p>
+The complete test script can be found at <a href="https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412" target="_blank" rel="noopener noreferrer">this link</a></p>
 
-<h2 id="general-purpose-implementation">
-<a class="anchor" href="#general-purpose-implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>General purpose implementation</h2>
+<h3 id="general-purpose-implementation">General purpose implementation</h3>
 
 <p>For adding the groups and menu items to the context menu, first let us define two classes <code class="highlighter-rouge">ContextMenuItem</code> and <code class="highlighter-rouge">ContextMenuGroup</code> for representing a menu item and a menu group respectively.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ContextMenuItem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -376,17 +349,47 @@ The steps of the functions are taken from the test implementation.</p>
 <span class="n">create_group</span><span class="p">(</span><span class="n">user_key</span><span class="p">,</span> <span class="n">group1</span><span class="p">)</span>
 </code></pre></div></div>
 <p>Great, that’s a nice nested context menu groups with items.
-\n
+<br>
 <img src="/naninaveen/images/python/contextmenu/4.png" alt=""></p>
 
-<p>But wait, you haven’t told me about how I remove them?</p>
+<p>But wait, you haven’t told me about how I can remove them and how I can add python scripts?</p>
 
 <h1>
-<a class="anchor" href="#_%E3%83%84_" aria-hidden="true"><span class="octicon octicon-link"></span></a>
 <center>
+<a href="https://github.com/naveennamani/pywin-cm" target="_blank" rel="noopener noreferrer">
 ¯\_(ツ)_/¯
+</a>
 </center>
 </h1>
+
+<hr>
+
+<script>
+    window.onload = function () {
+        let random_int = Math.round(Math.random() * 2352);
+        if (random_int === 404) {
+            alert("You're some randomly (un)lucky person");
+        }
+        fetch(`https://cors-anywhere.herokuapp.com/https://xkcd.com/${random_int}/info.0.json`).then(function (xkcd_res) {
+            return xkcd_res.json();
+        }).then(function (xkcd_json) {
+            document.getElementById("random_xkcd_img").src = xkcd_json.img;
+            document.getElementById("random_xkcd_img").alt = xkcd_json.alt;
+            document.getElementById("random_xkcd_anchor").href = "https://xkcd.com/" + random_int;
+            document.getElementById("random_xkcd_caption").innerHTML = "<h4>" + xkcd_json.safe_title + "</h4>";
+        });
+    };
+</script>
+
+<div class="xkcd-img">
+  <h3>Here's a random <a href="https://xkcd.com/">XKCD comic</a> for you.</h3>
+  <a id="random_xkcd_anchor">
+    <figure>
+      <figcaption id="random_xkcd_caption"></figcaption>
+      <img alt="Random XKCD comic" id="random_xkcd_img">
+    </figure>
+  </a>
+</div>
 
   </div>
 <a class="u-url" href="/naninaveen/python/organizing-windows-contextmenu/" hidden></a>

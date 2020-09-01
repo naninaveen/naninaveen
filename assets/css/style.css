@@ -429,6 +429,8 @@ table th { text-align: center !important; }
 
 .svg-icon.orange { width: 30px; height: 23px; }
 
+.post-content p, .post-content li { text-align: justify; }
+
 /*-----------------------------------*/
 /*----- ADD YOUR STYLES BELOW -------*/
 .language-python + .language-plaintext { border-left: 1px solid grey; margin-left: 1rem !important; }
