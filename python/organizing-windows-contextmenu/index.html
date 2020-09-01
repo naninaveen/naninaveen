@@ -125,6 +125,11 @@
 <li class="toc-entry toc-h2"><a href="#general-purpose-implementation">General purpose implementation</a></li>
 </ul>
 </li>
+<li class="toc-entry toc-h1"><a href="#_%E3%83%84_">
+
+¯\_(ツ)_/¯
+
+</a></li>
 </ul>
 <p><img src="/naninaveen/images/python/contextmenu/4.png" alt=""></p>
 <h1 id="grouping-custom-scripts-in-windows-right-click-contextmenu">
@@ -142,9 +147,9 @@ While I was tinkering about a solution, I right-clicked on the folder and though
 <a class="anchor" href="#finding-the-solution" aria-hidden="true"><span class="octicon octicon-link"></span></a>Finding the solution</h2>
 <p>The next moment, I stopped deleting files and instead started searching on google about “Adding python scripts to the Windows context menu”.
 I found a few tutorials and understood that adding items to the context menu requires creating keys in the windows registry.
-But thanks to the complexity of the Windows, the soutions I found seemed to be quite complex or less informative.
-While most of the tutorials focused on adding single item to the context menu, grouping items into a folder like structure is still not an intuitive step.
-It took me some experimentation and time to figure out how Windows actually deals with the registry keys when it comes to context menu.</p>
+But thanks to the complexity of the Windows, the solutions I found seemed to be quite complex or less informative.
+While most of the tutorials focused on adding a single item to the context menu, grouping items into a folder like structure is still not an intuitive step.
+It took me some experimentation and time to figure out how Windows actually deals with the registry keys when it comes to the context menu.</p>
 
 <p>There are atleast 15 registry keys where you can add context menu items.</p>
 <ol>
@@ -226,7 +231,7 @@ For adding items to all users <code class="highlighter-rouge">HKEY_CLASSES_ROOT<
 <a class="anchor" href="#test-implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test implementation</h3>
 <p>Let us first implement a simple script to add a menu item group “Group 1” and a two items “Item 1” and “Item 2” to the group.
 For adding registry keys we use python’s <code class="highlighter-rouge">winreg</code> library.
-First we import the required functions from the <code class="highlighter-rouge">winreg</code> library.</p>
+First, we import the required functions from the <code class="highlighter-rouge">winreg</code> library.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import required functions
 </span><span class="kn">from</span> <span class="nn">winreg</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CreateKey</span><span class="p">,</span> <span class="c1"># for creating/opening keys
@@ -249,7 +254,7 @@ First we import the required functions from the <code class="highlighter-rouge">
 <span class="c1"># Create a key 'SubCommands'
 </span><span class="n">SetValueEx</span><span class="p">(</span><span class="n">group_reg_key</span><span class="p">,</span> <span class="s">'SubCommands'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">REG_SZ</span><span class="p">,</span> <span class="s">''</span><span class="p">)</span>
 
-<span class="c1"># Create sub key "shell" for adding items
+<span class="c1"># Create subkey "shell" for adding items
 </span><span class="n">subcommands_key</span> <span class="o">=</span> <span class="n">CreateKey</span><span class="p">(</span><span class="n">group_reg_key</span><span class="p">,</span> <span class="s">'shell'</span><span class="p">)</span>
 </code></pre></div></div>
 <p>When you run this script it will create the group named “Group 1” in the context menu.
@@ -371,7 +376,17 @@ The steps of the functions are taken from the test implementation.</p>
 <span class="n">create_group</span><span class="p">(</span><span class="n">user_key</span><span class="p">,</span> <span class="n">group1</span><span class="p">)</span>
 </code></pre></div></div>
 <p>Great, that’s a nice nested context menu groups with items.
+\n
 <img src="/naninaveen/images/python/contextmenu/4.png" alt=""></p>
+
+<p>But wait, you haven’t told me about how I remove them?</p>
+
+<h1>
+<a class="anchor" href="#_%E3%83%84_" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<center>
+¯\_(ツ)_/¯
+</center>
+</h1>
 
   </div>
 <a class="u-url" href="/naninaveen/python/organizing-windows-contextmenu/" hidden></a>
