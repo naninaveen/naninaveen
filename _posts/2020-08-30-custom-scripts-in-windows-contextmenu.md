@@ -26,9 +26,9 @@ While I was tinkering about a solution, I right-clicked on the folder and though
 ## Finding the solution
 The next moment, I stopped deleting files and instead started searching on google about "Adding python scripts to the Windows context menu".
 I found a few tutorials and understood that adding items to the context menu requires creating keys in the windows registry.
-But thanks to the complexity of the Windows, the soutions I found seemed to be quite complex or less informative.
-While most of the tutorials focused on adding single item to the context menu, grouping items into a folder like structure is still not an intuitive step.
-It took me some experimentation and time to figure out how Windows actually deals with the registry keys when it comes to context menu.
+But thanks to the complexity of the Windows, the solutions I found seemed to be quite complex or less informative.
+While most of the tutorials focused on adding a single item to the context menu, grouping items into a folder like structure is still not an intuitive step.
+It took me some experimentation and time to figure out how Windows actually deals with the registry keys when it comes to the context menu.
 
 There are atleast 15 registry keys where you can add context menu items.
 1. `{BASE_ROOT}\\Directory\\shell\\` - to displays items when right click on a directory
@@ -98,7 +98,7 @@ ROOT
 ### Test implementation
 Let us first implement a simple script to add a menu item group "Group 1" and a two items "Item 1" and "Item 2" to the group.
 For adding registry keys we use python's `winreg` library.
-First we import the required functions from the `winreg` library.
+First, we import the required functions from the `winreg` library.
 ```python
 # Import required functions
 from winreg import (
@@ -123,7 +123,7 @@ SetValueEx(group_reg_key, 'MUIVerb', 0, REG_SZ, "Group 1")
 # Create a key 'SubCommands'
 SetValueEx(group_reg_key, 'SubCommands', 0, REG_SZ, '')
 
-# Create sub key "shell" for adding items
+# Create subkey "shell" for adding items
 subcommands_key = CreateKey(group_reg_key, 'shell')
 ```
 When you run this script it will create the group named "Group 1" in the context menu.
@@ -249,4 +249,13 @@ user_key = CreateKey(
 create_group(user_key, group1)
 ```
 Great, that's a nice nested context menu groups with items.
+\n
 ![]({{ site.baseurl }}/images/python/contextmenu/4.png)
+
+But wait, you haven't told me about how I remove them?
+
+<h1>
+<center>
+¯\_(ツ)_/¯
+</center>
+</h1>
