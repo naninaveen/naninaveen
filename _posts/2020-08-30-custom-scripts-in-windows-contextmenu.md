@@ -1,5 +1,5 @@
 ---
-toc: true
+toc: false
 
 layout: post
 
@@ -160,9 +160,9 @@ You'll see the following structure corresponding to the context menu group we've
 ![]({{ site.baseurl }}/images/python/contextmenu/3.png)
 
 Congratulations, :smiley: :clap: :star2: we did it.
-The complete test script can be found at [this link](https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412).
+The complete test script can be found at <a href = "https://gist.github.com/naninaveen/124fa967557d0719781bea129f278412" target = "_blank" rel = "noopener noreferrer">this link</a>
 
-## General purpose implementation
+### General purpose implementation
 
 For adding the groups and menu items to the context menu, first let us define two classes `ContextMenuItem` and `ContextMenuGroup` for representing a menu item and a menu group respectively.
 ```python
@@ -249,13 +249,19 @@ user_key = CreateKey(
 create_group(user_key, group1)
 ```
 Great, that's a nice nested context menu groups with items.
-\n
+<br/>
 ![]({{ site.baseurl }}/images/python/contextmenu/4.png)
 
-But wait, you haven't told me about how I remove them?
+But wait, you haven't told me about how I can remove them and how I can add python scripts?
 
 <h1>
 <center>
+<a href = "https://github.com/naveennamani/pywin-cm" target="_blank" rel="noopener noreferrer">
 ¯\_(ツ)_/¯
+</a>
 </center>
 </h1>
+
+---
+
+{% include random_xkcd.html %}
