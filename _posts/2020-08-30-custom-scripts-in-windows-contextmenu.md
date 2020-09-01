@@ -1,5 +1,5 @@
 ---
-toc: false
+toc: true
 
 layout: post
 
@@ -254,7 +254,7 @@ Great, that's a nice nested context menu groups with items.
 
 But wait, you haven't told me about how I can remove them and how I can add python scripts?
 
-<h1>
+<h1 class = "no_toc">
 <center>
 <a href = "https://github.com/naveennamani/pywin-cm" target="_blank" rel="noopener noreferrer">
 ¯\_(ツ)_/¯
