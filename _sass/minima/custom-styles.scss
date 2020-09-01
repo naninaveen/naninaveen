@@ -2,7 +2,9 @@
 /*--- IMPORT STYLES FOR FASTPAGES ---*/
 @import "minima/fastpages-styles";   
 
-
+.post-content p, .post-content li {
+    text-align: justify;
+}
 
 /*-----------------------------------*/
 /*----- ADD YOUR STYLES BELOW -------*/
